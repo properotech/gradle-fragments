@@ -1,0 +1,69 @@
+sourceSets {
+    componentTest {
+        java {
+            srcDir 'src/componentTest/java'
+        }
+        groovy {
+            srcDir 'src/componentTest/groovy'
+        }
+        resources {
+            srcDir 'src/componentTest/resources'
+        }
+        compileClasspath += main.compileClasspath + main.output + test.output
+        runtimeClasspath += main.runtimeClasspath + main.output + test.output
+    }
+}
+
+configurations {
+    componentTestCompile.extendsFrom testCompile
+    componentTestRuntime.extendsFrom testRuntime
+}
+
+task clusterUp(type: Exec) {
+    group 'Docker-compose'
+    commandLine dc('up', '-d')
+    ignoreExitValue true
+}
+
+task clusterServiceStop(type: Exec) {
+    group 'Docker-compose'
+    commandLine dc('stop', '-t', '60', 'affiliate-app')
+}
+
+task clusterStop(type: Exec) {
+    group 'Docker-compose'
+    commandLine dc('stop', '-t', '60')
+}
+
+task clusterServiceLogs(type: Exec) {
+    group 'Docker-compose'
+    commandLine dc('logs', 'affiliate-app')
+}
+
+task clusterLogs(type: Exec) {
+    group 'Docker-compose'
+    commandLine dc('logs', '-f')
+}
+
+task clusterDown(type: Exec) {
+    group 'Docker-compose'
+    commandLine dc('down')
+}
+
+task componentTest (type: Test) {
+    group = 'verification'
+    dependsOn clusterUp
+
+    testClassesDirs = sourceSets.componentTest.output.classesDirs
+    classpath = sourceSets.componentTest.runtimeClasspath
+    outputs.upToDateWhen { false }
+    testLogging.showStandardStreams = true
+
+    finalizedBy clusterStop, clusterServiceLogs, clusterDown
+}
+
+clusterDown.mustRunAfter clusterServiceStop, clusterStop, clusterServiceLogs
+
+static List<String> dc(String ... args) {
+    return ['docker-compose'] + Arrays.asList(args)
+}
