@@ -27,7 +27,7 @@ task clusterUp(type: Exec) {
 
 task clusterServiceStop(type: Exec) {
     group 'Docker-compose'
-    commandLine dc('stop', '-t', '60', 'affiliate-app')
+    commandLine dc('stop', '-t', '60', "${project.name}")
 }
 
 task clusterStop(type: Exec) {
@@ -37,7 +37,7 @@ task clusterStop(type: Exec) {
 
 task clusterServiceLogs(type: Exec) {
     group 'Docker-compose'
-    commandLine dc('logs', 'affiliate-app')
+    commandLine dc('logs', "${project.name}")
 }
 
 task clusterLogs(type: Exec) {
