@@ -1,0 +1,61 @@
+def DEFAULT_FAIL_ON_COVERAGE = true
+def DEFAULT_LINE_THRESHOLD = 0.8
+def DEFAULT_EXCLUDE_FROM_COVERAGE = []
+
+apply plugin: 'jacoco'
+
+if (file('coverage-config.gradle').exists()) {
+    apply from: 'coverage-config.gradle'
+}
+
+if (!project.hasProperty('failOnCoverage')) {
+    ext.failOnCoverage = DEFAULT_FAIL_ON_COVERAGE
+}
+
+if (!project.hasProperty('lineCoverageRatioThreshold')) {
+    ext.lineCoverageRatioThreshold = DEFAULT_LINE_THRESHOLD
+}
+
+if (!project.hasProperty('excludeFromCoverage')) {
+    ext.excludeFromCoverage = DEFAULT_EXCLUDE_FROM_COVERAGE
+}
+
+jacoco {
+    toolVersion = '0.8.2'
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+    afterEvaluate {
+        // From Gradle 5.0 onwards, use:   classDirectories.from(classDirectories.files.collect {...
+        classDirectories = files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: project.excludeFromCoverage)
+        })
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = project.lineCoverageRatioThreshold
+            }
+        }
+        afterEvaluate {
+            // From Gradle 5.0 onwards, use:   classDirectories.from(classDirectories.files.collect {...
+            classDirectories = files(classDirectories.files.collect {
+                fileTree(dir: it, exclude: project.excludeFromCoverage)
+            })
+        }
+    }
+}
+
+test.finalizedBy jacocoTestReport
+
+if (project.failOnCoverage) {
+    check.dependsOn jacocoTestCoverageVerification
+}
