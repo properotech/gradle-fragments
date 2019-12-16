@@ -9,8 +9,8 @@ sourceSets {
         resources {
             srcDir 'src/componentTest/resources'
         }
-        compileClasspath += main.compileClasspath + main.output + test.output
-        runtimeClasspath += main.runtimeClasspath + main.output + test.output
+        compileClasspath += test.compileClasspath + main.output + test.output
+        runtimeClasspath += test.runtimeClasspath + main.output + test.output
     }
 }
 
