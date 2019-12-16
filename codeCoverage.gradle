@@ -21,7 +21,7 @@ if (!project.hasProperty('excludeFromCoverage')) {
 }
 
 jacoco {
-    toolVersion = '0.8.2'
+    toolVersion = '0.8.5'
 }
 
 jacocoTestReport {
@@ -29,10 +29,9 @@ jacocoTestReport {
         xml.enabled true
     }
     afterEvaluate {
-        // From Gradle 5.0 onwards, use:   classDirectories.from(classDirectories.files.collect {...
-        classDirectories = files(classDirectories.files.collect {
+        classDirectories.setFrom(files(classDirectories.files.collect {
             fileTree(dir: it, exclude: project.excludeFromCoverage)
-        })
+        }))
     }
 }
 
@@ -45,12 +44,11 @@ jacocoTestCoverageVerification {
                 minimum = project.lineCoverageRatioThreshold
             }
         }
-        afterEvaluate {
-            // From Gradle 5.0 onwards, use:   classDirectories.from(classDirectories.files.collect {...
-            classDirectories = files(classDirectories.files.collect {
-                fileTree(dir: it, exclude: project.excludeFromCoverage)
-            })
-        }
+    }
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: project.excludeFromCoverage)
+        }))
     }
 }
 
