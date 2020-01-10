@@ -13,7 +13,7 @@ assert project.hasProperty('repositoryPassword'): "repositoryPassword not define
 
 repositories {
     maven {
-        name = "Propero Repository"
+        name = "skillingArtifactory"
         url = project.publicRepository
         credentials {
             username = "${repositoryUser}"
@@ -36,4 +36,8 @@ publishing {
             }
         }
     }
+}
+
+tasks.withType(GenerateModuleMetadata) {
+    enabled = false
 }
