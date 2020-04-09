@@ -3,9 +3,6 @@ sourceSets {
         java {
             srcDir 'src/componentTest/java'
         }
-        groovy {
-            srcDir 'src/componentTest/groovy'
-        }
         resources {
             srcDir 'src/componentTest/resources'
         }
